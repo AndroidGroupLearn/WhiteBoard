@@ -1,5 +1,6 @@
 package pl.epiklp.whiteboard.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Window;
@@ -24,6 +25,7 @@ public class LogoActivity extends AppCompatActivity {
         logoMain = findViewById(R.id.logoMain);
         Animation logoAnimation = AnimationUtils.loadAnimation(this, R.anim.anim);
         logoMain.startAnimation(logoAnimation);
+        final Intent mIntent = new Intent(this, ClientServerActivity.class);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -32,8 +34,8 @@ public class LogoActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                    //startActivity(mIntent);
-                    //finish();
+                    startActivity(mIntent);
+                    finish();
                 }
             }
         }).start();

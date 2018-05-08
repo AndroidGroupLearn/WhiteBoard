@@ -15,9 +15,7 @@ import pl.epiklp.whiteboard.R;
  */
 
 public class ClientServerActivity extends AppCompatActivity {
-
-    private ImageView clientImage, serverImage;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +24,7 @@ public class ClientServerActivity extends AppCompatActivity {
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
-        clientImage = findViewById(R.id.clientImage);
+        final ImageView clientImage = findViewById(R.id.clientImage);
         clientImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -34,13 +32,12 @@ public class ClientServerActivity extends AppCompatActivity {
             }
         });
 
-        serverImage = findViewById(R.id.serverImage);
+        final ImageView serverImage = findViewById(R.id.serverImage);
         serverImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "server", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 }

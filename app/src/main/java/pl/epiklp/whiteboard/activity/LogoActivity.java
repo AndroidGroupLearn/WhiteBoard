@@ -13,8 +13,6 @@ import pl.epiklp.whiteboard.R;
 
 public class LogoActivity extends AppCompatActivity {
 
-    private ImageView logoMain;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,7 +20,7 @@ public class LogoActivity extends AppCompatActivity {
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
-        logoMain = findViewById(R.id.logoMain);
+        final ImageView logoMain = findViewById(R.id.logoMain);
         Animation logoAnimation = AnimationUtils.loadAnimation(this, R.anim.anim);
         logoMain.startAnimation(logoAnimation);
         final Intent mIntent = new Intent(this, ClientServerActivity.class);
@@ -39,6 +37,5 @@ public class LogoActivity extends AppCompatActivity {
                 }
             }
         }).start();
-
     }
 }

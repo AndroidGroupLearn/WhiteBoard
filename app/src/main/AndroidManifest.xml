@@ -23,6 +23,13 @@
                 android:value=".activity.ClientServerActivity">
             </meta-data>
         </activity>
+        <activity android:name=".activity.ClientSearchActivity"
+            android:parentActivityName=".activity.ClientSearchActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.ClientServerActivity">
+            </meta-data>
+        </activity>
     </application>
 
 </manifest>

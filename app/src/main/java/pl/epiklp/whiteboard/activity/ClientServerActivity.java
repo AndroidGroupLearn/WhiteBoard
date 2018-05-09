@@ -1,5 +1,6 @@
 package pl.epiklp.whiteboard.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -15,11 +16,11 @@ import pl.epiklp.whiteboard.R;
  */
 
 public class ClientServerActivity extends AppCompatActivity {
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.client_server_activity);
+        setContentView(R.layout.activity_client_server);
 
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
@@ -28,7 +29,8 @@ public class ClientServerActivity extends AppCompatActivity {
         clientImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "client", Toast.LENGTH_SHORT).show();
+                final Intent mIntent = new Intent(ClientServerActivity.this, ClientSearchActivity.class);
+                startActivity(mIntent);
             }
         });
 

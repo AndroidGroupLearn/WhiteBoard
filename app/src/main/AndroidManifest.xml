@@ -49,8 +49,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.ChoiseClientServerActivity" />
         </activity>
-        <activity android:name=".activity.ServerModeActivity"></activity>
-        <activity android:name=".activity.ClientModeActivity"></activity>
+        <activity android:name=".activity.ConnectionTestActivity"></activity>
     </application>
 
 </manifest>

@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import pl.epiklp.whiteboard.R;
 
@@ -29,8 +28,10 @@ public class ChoiseClientServerActivity extends AppCompatActivity {
         clientImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Intent mIntent = new Intent(ChoiseClientServerActivity.this, ClientModeActivity.class);
-                startActivity(mIntent);
+                final Intent mIntent = new Intent(ChoiseClientServerActivity.this, ConnectionTestActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("isServer", true);
+                startActivity(mIntent, bundle);
             }
         });
 
@@ -39,8 +40,10 @@ public class ChoiseClientServerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //TODO dorzuciłem ServerModa zamiast Toasta
-                final Intent mIntent = new Intent(ChoiseClientServerActivity.this, ServerModeActivity.class);
-                startActivity(mIntent);
+                final Intent mIntent = new Intent(ChoiseClientServerActivity.this, ConnectionTestActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("isServer", false);
+                startActivity(mIntent, bundle);
             }
         });
     }

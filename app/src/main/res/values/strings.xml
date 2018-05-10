@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">WhiteBoard</string>
+    <string name="discovery_toggle_btn">Discovering</string>
+    <string name="send">Send</string>
 </resources>

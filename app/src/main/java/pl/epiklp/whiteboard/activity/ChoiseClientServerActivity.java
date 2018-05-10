@@ -15,7 +15,7 @@ import pl.epiklp.whiteboard.R;
  * Created by epiklp on 08.05.18.
  */
 
-public class ClientServerActivity extends AppCompatActivity {
+public class ChoiseClientServerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +29,7 @@ public class ClientServerActivity extends AppCompatActivity {
         clientImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Intent mIntent = new Intent(ClientServerActivity.this, ClientSearchActivity.class);
+                final Intent mIntent = new Intent(ChoiseClientServerActivity.this, ClientModeActivity.class);
                 startActivity(mIntent);
             }
         });
@@ -38,7 +38,9 @@ public class ClientServerActivity extends AppCompatActivity {
         serverImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "server", Toast.LENGTH_SHORT).show();
+                //TODO dorzuciłem ServerModa zamiast Toasta
+                final Intent mIntent = new Intent(ChoiseClientServerActivity.this, ServerModeActivity.class);
+                startActivity(mIntent);
             }
         });
     }

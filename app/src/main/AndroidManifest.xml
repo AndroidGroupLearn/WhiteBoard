@@ -3,17 +3,23 @@
     package="pl.epiklp.whiteboard">
 
     <uses-permission
-        android:required="true"
-        android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+        android:name="android.permission.BLUETOOTH"
+        android:required="true" />
     <uses-permission
-        android:required="true"
-        android:name="android.permission.ACCESS_WIFI_STATE"/>
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:required="true" />
     <uses-permission
-        android:required="true"
-        android:name="android.permission.CHANGE_WIFI_STATE"/>
+        android:name="android.permission.ACCESS_WIFI_STATE"
+        android:required="true" />
     <uses-permission
-        android:required="true"
-        android:name="android.permission.INTERNET"/>
+        android:name="android.permission.CHANGE_WIFI_STATE"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -29,20 +35,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.ClientServerActivity"
+        <activity
+            android:name=".activity.ChoiseClientServerActivity"
             android:parentActivityName=".activity.LogoActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.ClientServerActivity">
-            </meta-data>
+                android:value=".activity.ChoiseClientServerActivity" />
         </activity>
-        <activity android:name=".activity.ClientSearchActivity"
+        <activity
+            android:name=".activity.ClientSearchActivity"
             android:parentActivityName=".activity.ClientSearchActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.ClientServerActivity">
-            </meta-data>
+                android:value=".activity.ChoiseClientServerActivity" />
         </activity>
+        <activity android:name=".activity.ServerModeActivity"></activity>
+        <activity android:name=".activity.ClientModeActivity"></activity>
     </application>
 
 </manifest>

@@ -29,9 +29,8 @@ public class ChoiseClientServerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 final Intent mIntent = new Intent(ChoiseClientServerActivity.this, ConnectionTestActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("isServer", true);
-                startActivity(mIntent, bundle);
+                mIntent.putExtra("isServer", true);
+                startActivity(mIntent);
             }
         });
 
@@ -42,9 +41,8 @@ public class ChoiseClientServerActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //TODO dorzuciłem ServerModa zamiast Toasta
                 final Intent mIntent = new Intent(ChoiseClientServerActivity.this, ConnectionTestActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("isServer", false);
-                startActivity(mIntent, bundle);
+                mIntent.putExtra("isServer", false);
+                startActivity(mIntent);
             }
         });
     }

@@ -1,13 +1,15 @@
 package pl.epiklp.whiteboard.activity;
-import static java.nio.charset.StandardCharsets.UTF_8;
+
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.util.SimpleArrayMap;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -28,49 +30,73 @@ import com.google.android.gms.nearby.connection.Strategy;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 import pl.epiklp.whiteboard.R;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 
 public class ConnectionTestActivity extends AppCompatActivity {
 
+    public final static String SERVICE_ID = "pl.epiklp.whiteboard";
     private static final String TAG = ConnectionTestActivity.class.getSimpleName();
-    private ToggleButton advertisingBtn;
-    private ToggleButton discoveryBtn;
-
     private boolean isServer;
 
-    private List<String> endpointIds;
+    private String msg;
     private static String userNickname = "test";
-    public final static String SERVICE_ID = "pl.epiklp.whiteboard";
-    private ConnectionsClient connectionsClient;
+    private ToggleButton advertisingBtn;
+    private ToggleButton discoveryBtn;
+    private TextView msgTv;
 
+    private List<String> endpointIds;
+    private ConnectionsClient connectionsClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection_test);
-        isServer = getIntent().getBooleanExtra("isServer", false);
+
+        isServer = getIntent().getExtras().getBoolean("isServer");
 
         endpointIds = new ArrayList<>();
-        advertisingBtn  = findViewById(R.id.advertisingToggleBtn);
-        discoveryBtn    = findViewById(R.id.discoveryToggleBtn);
+
+        advertisingBtn = findViewById(R.id.advertisingToggleBtn);
+        discoveryBtn = findViewById(R.id.discoveryToggleBtn);
+        msgTv = findViewById(R.id.msg_tv);
 
         advertisingBtn.setChecked(false);
         advertisingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!advertisingBtn.isChecked()){
+                if (!advertisingBtn.isChecked()) {
                     connectionsClient.stopAdvertising();
                     Log.d(TAG, "Stop advertising");
-                }else{
+                } else {
                     startAdvertising();
                     Log.d(TAG, "Start advertising");
                 }
             }
         });
+
+        discoveryBtn.setChecked(false);
+        discoveryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!discoveryBtn.isChecked()) {
+                    connectionsClient.stopDiscovery();
+                    Log.d(TAG, "Stop discovering");
+                } else {
+                    startDiscovery();
+                    Log.d(TAG, "Start discovering");
+                }
+            }
+        });
+
+       // if(isServer)    discoveryBtn.setVisibility(View.INVISIBLE);
+       // else            advertisingBtn.setVisibility(View.INVISIBLE);
     }
 
     private void startAdvertising() {
@@ -93,24 +119,52 @@ public class ConnectionTestActivity extends AppCompatActivity {
                         });
     }
 
+    public void sendTestMessage(View view) {
+        EditText editText = findViewById(R.id.message_et);
+        String msg = editText.getText().toString();
+        msgTv.append(msg + "\n");
+        editText.setText("");
+        connectionsClient.sendPayload(endpointIds, Payload.fromBytes(msg.getBytes(UTF_8)));
+    }
+
+    private void startDiscovery() {
+        connectionsClient = Nearby.getConnectionsClient(this);
+        connectionsClient.startDiscovery(SERVICE_ID, endpointDiscoveryCallback, new DiscoveryOptions(Strategy.P2P_CLUSTER))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(ConnectionTestActivity.this, "Start discovering!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ConnectionTestActivity.this, "Unable to start discovering!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
     private PayloadCallback payloadCallback = new PayloadCallback() {
         @Override
-        public void onPayloadReceived(@NonNull String s, @NonNull Payload payload) {
-            Toast.makeText(ConnectionTestActivity.this, "OK", Toast.LENGTH_SHORT).show();
+        public void onPayloadReceived(@NonNull String endpointID, @NonNull Payload payload) {
+            try {
+                msg = new String(endpointID.getBytes("UTF-8" ));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            msgTv.append(msg);
         }
 
         @Override
-        public void onPayloadTransferUpdate(@NonNull String s, @NonNull PayloadTransferUpdate payloadTransferUpdate) {
-            Toast.makeText(ConnectionTestActivity.this, "Wysyłam", Toast.LENGTH_SHORT).show();
+        public void onPayloadTransferUpdate(@NonNull String endpointID, @NonNull PayloadTransferUpdate payloadTransferUpdate) {
         }
     };
-
     private ConnectionLifecycleCallback mConnectionLifecycleCallback = new ConnectionLifecycleCallback() {
         @Override
-        public void onConnectionInitiated(@NonNull String s, @NonNull ConnectionInfo connectionInfo) {
+        public void onConnectionInitiated(@NonNull String endpointID, @NonNull ConnectionInfo connectionInfo) {
             //Show alertBox with confirm connection with Client
             //TODO bottom alertDialog isn't showing
-            final String id = s;
+            final String id = endpointID;
             new AlertDialog.Builder(ConnectionTestActivity.this)
                     .setTitle("Accept connection with " + connectionInfo.getEndpointName())
                     .setMessage("Confirm the code " + connectionInfo.getAuthenticationToken())
@@ -132,11 +186,11 @@ public class ConnectionTestActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onConnectionResult(@NonNull String s, @NonNull ConnectionResolution connectionResolution) {
-            switch (connectionResolution.getStatus().getStatusCode()){
+        public void onConnectionResult(@NonNull String endpointID, @NonNull ConnectionResolution connectionResolution) {
+            switch (connectionResolution.getStatus().getStatusCode()) {
                 case ConnectionsStatusCodes.STATUS_OK: {
                     Toast.makeText(ConnectionTestActivity.this, "Connection is OK!", Toast.LENGTH_SHORT).show();
-                    endpointIds.add(s);
+                    endpointIds.add(endpointID);
                     break;
                 }
                 case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
@@ -148,51 +202,29 @@ public class ConnectionTestActivity extends AppCompatActivity {
 
             }
         }
-
         @Override
         public void onDisconnected(@NonNull String s) {
             //After disconnected, we can't sending or receiving.
             Toast.makeText(ConnectionTestActivity.this, "Disconnected", Toast.LENGTH_SHORT).show();
+            //TODO make label for this
+            discoveryBtn.setChecked(false);
         }
     };
-
-
-    public void sendTestMessage(View view) {
-        EditText editText = findViewById(R.id.message_et);
-        String msg = editText.getText().toString();
-        editText.setText("");
-        connectionsClient.sendPayload(endpointIds, Payload.fromBytes(msg.getBytes(UTF_8)));
-    }
     private EndpointDiscoveryCallback endpointDiscoveryCallback = new EndpointDiscoveryCallback() {
         @Override
-        public void onEndpointFound(@NonNull String s, @NonNull DiscoveredEndpointInfo discoveredEndpointInfo) {
+        public void onEndpointFound(@NonNull String endpointID, @NonNull DiscoveredEndpointInfo discoveredEndpointInfo) {
             Toast.makeText(ConnectionTestActivity.this, discoveredEndpointInfo.getEndpointName(), Toast.LENGTH_SHORT).show();
 
-            connectionsClient.requestConnection("MFN", discoveredEndpointInfo.getEndpointName(), mConnectionLifecycleCallback);
+            connectionsClient.requestConnection(userNickname, endpointID, mConnectionLifecycleCallback);
+
             //after connection we stop searching
             connectionsClient.stopAdvertising();
         }
+
         @Override
         public void onEndpointLost(@NonNull String s) {
             Toast.makeText(ConnectionTestActivity.this, "A previously EndPoint was lost.", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "A previously EndPoint was lost.");
         }
     };
-
-    private void startDiscovery(){
-        connectionsClient = Nearby.getConnectionsClient(this);
-        connectionsClient.startDiscovery(ConnectionTestActivity.SERVICE_ID, endpointDiscoveryCallback, new DiscoveryOptions(Strategy.P2P_CLUSTER))
-                .addOnSuccessListener(new OnSuccessListener<Void>(){
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(ConnectionTestActivity.this, "Start discovering!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ConnectionTestActivity.this, "Unable to start discovering!", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
 }

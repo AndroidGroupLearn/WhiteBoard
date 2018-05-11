@@ -35,6 +35,7 @@ public class ChoiseClientServerActivity extends AppCompatActivity {
             }
         });
 
+
         final ImageView serverImage = findViewById(R.id.serverImage);
         serverImage.setOnClickListener(new View.OnClickListener() {
             @Override

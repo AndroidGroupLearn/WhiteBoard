@@ -6,4 +6,6 @@
     <color name="white">#FFF</color>
     <color name="backgroundGradientStartColor">#141E30</color>
     <color name="backgroundGradientEndColor">#243B55</color>
+    <color name="menuColor">#ffe0bd</color>
+    <color name="Light_Gray">#d3d3d3</color>
 </resources>

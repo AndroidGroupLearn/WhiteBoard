@@ -1,5 +1,6 @@
 package pl.epiklp.whiteboard;
 
+import android.accessibilityservice.FingerprintGestureController;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
@@ -7,10 +8,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.EmbossMaskFilter;
 import android.graphics.MaskFilter;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -28,6 +33,7 @@ public class CanvasView extends View {
     public static final int DEFAULT_COLOR = Color.BLACK;
     private static final int DEFAULT_BACKGROUND = Color.WHITE;
     private static final int TOUCH_TOLERANCE = 4;
+    private static final float DEFAULT_ZOOM = 1;
     private float mX, mY;
     private Path mPath;
     private Paint mPaint;
@@ -35,6 +41,7 @@ public class CanvasView extends View {
     private int currentColor;
     private int backgroundColor;
     private int strokeWidth;
+    private float backgroundZoom;
     private boolean emboss = false;
     private boolean blur = false;
     private MaskFilter mEmboss;
@@ -42,6 +49,9 @@ public class CanvasView extends View {
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+    private PointF start = new PointF();
+
+    private GestureDetector gestureDetector;
 
 
 
@@ -66,13 +76,25 @@ public class CanvasView extends View {
         mBlur = new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL);
     }
 
-    public void init(int width, int height){
+    public void zoom(){
+        Matrix mMatrix = new Matrix();
+        backgroundZoom *= 2;
+        mMatrix.setScale(backgroundZoom, backgroundZoom);
+        mCanvas.setMatrix(mMatrix);
+    //    refreshDrawableState();
+    }
 
-        mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+    public void init(DisplayMetrics metrics){
+        Matrix mMatrix = new Matrix();
+        mMatrix.setScale(1,1);
+        mBitmap = Bitmap.createBitmap(metrics.widthPixels, metrics.heightPixels, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+        mCanvas.setMatrix(mMatrix);
         currentColor = DEFAULT_COLOR;
         backgroundColor = DEFAULT_BACKGROUND;
         strokeWidth = BRUSH_SIZE;
+        backgroundZoom = DEFAULT_ZOOM;
     }
 
     public void normal(){
@@ -93,7 +115,6 @@ public class CanvasView extends View {
     @Override
     public void onDraw(Canvas canvas){
         canvas.save();
-
         mCanvas.drawColor(backgroundColor);
         for(FingerPath fp: paths){
             mPaint.setColor(currentColor);
@@ -139,22 +160,47 @@ public class CanvasView extends View {
     public boolean onTouchEvent(MotionEvent event){
         float x = event.getX();
         float y = event.getY();
+        if(event.getPointerCount() == 1) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    touchStart(x / backgroundZoom, y / backgroundZoom);
+                    invalidate();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    onMove(x / backgroundZoom, y / backgroundZoom);
+                    invalidate();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    touchUp();
+                    invalidate();
+                    break;
+            }
+        }else if(event.getPointerCount() == 2){
 
-        switch (event.getAction()){
-            case MotionEvent.ACTION_DOWN :
-                touchStart(x, y);
-                invalidate();
-                break;
-            case MotionEvent.ACTION_MOVE :
-                onMove(x, y);
-                invalidate();
-                break;
-            case MotionEvent.ACTION_UP :
-                touchUp();
-                invalidate();
-                break;
         }
 
         return true;
+    }
+
+    public void back(){
+        if(paths.size() > 0)
+            paths.remove(paths.size()-1);
+        invalidate();
+    }
+
+    public void clear(){
+        if(paths.size() > 0)
+            paths.clear();
+        invalidate();
+    }
+
+    private float spacing(MotionEvent event){
+        float x = event.getX(0) - event.getX(1);
+        float y = event.getY(0) - event.getY(1);
+        return (float)Math.sqrt(x * x + y * y);
+    }
+
+    private void midle(){
+
     }
 }
